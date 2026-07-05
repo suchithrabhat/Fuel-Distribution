@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Customers</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin-panel.css">
+</head>
+
+<body>
+<div class="admin-shell">
+    <aside class="sidebar" aria-label="Admin navigation">
+        <div class="logo">Admin Panel</div>
+        <a href="add_distributor.html">Add Distributor</a>
+        <a href="view_distributors.html">View Distributors</a>
+        <a href="view_customers.html" class="active">View Customers</a>
+        <a href="login.html">Logout</a>
+    </aside>
+
+    <main class="admin-main">
+        <section class="admin-page">
+            <header class="admin-header">
+                <div class="admin-title">
+                    <span class="admin-eyebrow">Customer Directory</span>
+                    <h1>View Customers</h1>
+                    <p>Review registered customer contact information and delivery addresses in one clean workspace.</p>
+                </div>
+
+                <div class="admin-stat" aria-live="polite">
+                    <div>
+                        <span>Total Customers</span>
+                        <strong id="customerCount">0</strong>
+                    </div>
+                    <div class="admin-stat-icon">CU</div>
+                </div>
+            </header>
+
+            <div class="admin-toolbar">
+                <label class="search-wrap" for="customerSearch">
+                    <input id="customerSearch" type="search" placeholder="Search customers" autocomplete="off">
+                </label>
+            </div>
+
+            <section class="table-box" aria-label="Customer table">
+                <div class="table-scroll">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="customerTable">
+                            <tr>
+                                <td colspan="5" class="state-cell">
+                                    <strong>Loading customers</strong>
+                                    Fetching the latest records.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+    </main>
+</div>
+
+<script>
+const customerTable = document.getElementById("customerTable");
+const customerCount = document.getElementById("customerCount");
+const customerSearch = document.getElementById("customerSearch");
+let customers = [];
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function renderCustomers(list) {
+    customerCount.textContent = customers.length;
+
+    if (list.length === 0) {
+        customerTable.innerHTML = `
+            <tr>
+                <td colspan="5" class="state-cell">
+                    <strong>No customers found</strong>
+                    Try adjusting your search.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    customerTable.innerHTML = list.map(customer => `
+        <tr>
+            <td data-label="ID"><span class="id-pill">${escapeHtml(customer.id)}</span></td>
+            <td data-label="Name" class="name-cell">${escapeHtml(customer.name)}</td>
+            <td data-label="Email" class="muted-cell">${escapeHtml(customer.email)}</td>
+            <td data-label="Phone">${escapeHtml(customer.phone)}</td>
+            <td data-label="Address">${escapeHtml(customer.address)}</td>
+        </tr>
+    `).join("");
+}
+
+function filterCustomers() {
+    const query = customerSearch.value.trim().toLowerCase();
+
+    if (!query) {
+        renderCustomers(customers);
+        return;
+    }
+
+    const filtered = customers.filter(customer => {
+        return [customer.id, customer.name, customer.email, customer.phone, customer.address]
+            .some(value => String(value ?? "").toLowerCase().includes(query));
+    });
+
+    renderCustomers(filtered);
+}
+
+customerSearch.addEventListener("input", filterCustomers);
+
+fetch("http://127.0.0.1:7000/view_customers")
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Unable to load customers");
+        }
+        return response.json();
+    })
+    .then(data => {
+        customers = Array.isArray(data) ? data : [];
+        renderCustomers(customers);
+    })
+    .catch(error => {
+        console.log("ERROR:", error);
+        customerTable.innerHTML = `
+            <tr>
+                <td colspan="5" class="state-cell error">
+                    <strong>Customers could not be loaded</strong>
+                    Check that the backend server is running.
+                </td>
+            </tr>
+        `;
+    });
+</script>
+</body>
+</html>

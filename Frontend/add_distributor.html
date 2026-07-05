@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Distributor</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin-panel.css">
+</head>
+
+<body>
+<div class="admin-shell">
+    <aside class="sidebar" aria-label="Admin navigation">
+        <div class="logo">Admin Panel</div>
+        <a href="add_distributor.html" class="active">Add Distributor</a>
+        <a href="view_distributors.html">View Distributors</a>
+        <a href="view_customers.html">View Customers</a>
+        <a href="login.html">Logout</a>
+    </aside>
+
+    <main class="admin-main">
+        <section class="admin-page">
+            <header class="admin-header">
+                <div class="admin-title">
+                    <span class="admin-eyebrow">Distributor Setup</span>
+                    <h1>Add Distributor</h1>
+                    <p>Create a distributor profile with contact, service area, address, and login details.</p>
+                </div>
+
+                <div class="admin-stat">
+                    <div>
+                        <span>Panel Mode</span>
+                        <strong>Admin</strong>
+                    </div>
+                    <div class="admin-stat-icon">FD</div>
+                </div>
+            </header>
+
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h2>Distributor Details</h2>
+                    <p>Enter accurate information so customers can find and book from the right distributor.</p>
+
+                    <form id="distributorForm" class="form-grid">
+                        <label class="field">
+                            Name
+                            <input type="text" id="name" placeholder="Enter distributor name" autocomplete="name" required>
+                        </label>
+
+                        <label class="field">
+                            Phone
+                            <input type="text"
+                                    id="phone"
+                                    placeholder="Enter phone number"
+                                    maxlength="10"
+                                    pattern="[0-9]{10}"
+                                    autocomplete="tel"
+                                    required>
+                        </label>
+
+                        <label class="field full">
+                            Email
+                            <input type="email"
+                                    id="email"
+                                    placeholder="name@example.com"
+                                    autocomplete="email"
+                                    required>
+                        </label>
+
+                        <label class="field">
+                            City
+                            <input type="text" id="city" placeholder="Enter city" required>
+                        </label>
+
+                        <label class="field">
+                            Pincode
+                            <input type="text"
+                                    id="pincode"
+                                    placeholder="Enter pincode"
+                                    maxlength="6"
+                                    pattern="[0-9]{6}"
+                                    required>
+                        </label>
+
+                        <label class="field full">
+                            Address
+                            <textarea id="address" placeholder="Enter complete address" required></textarea>
+                        </label>
+
+                        <label class="field full">
+                            Password
+                            <input type="password" id="password" placeholder="Create login password" autocomplete="new-password" required>
+                        </label>
+
+                        <div class="submit-row">
+                            <button type="submit">Add Distributor</button>
+                            <p id="message"></p>
+                        </div>
+                    </form>
+                </div>
+
+                <aside class="side-panel">
+                    <h2>Clean onboarding</h2>
+                    <p>Keep distributor data complete so the booking and supply workflow stays reliable.</p>
+
+                    <div class="side-list">
+                        <div class="side-item">
+                            <strong>Service Area</strong>
+                            <span>City and pincode help customer discovery.</span>
+                        </div>
+                        <div class="side-item">
+                            <strong>Contact Ready</strong>
+                            <span>Email and phone support follow-up.</span>
+                        </div>
+                        <div class="side-item">
+                            <strong>Secure Login</strong>
+                            <span>Password enables distributor panel access.</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+document.getElementById("distributorForm")
+.addEventListener("submit", function(e) {
+
+    e.preventDefault();
+
+    const message = document.getElementById("message");
+
+    message.className = "";
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const city = document.getElementById("city").value.trim();
+    const pincode = document.getElementById("pincode").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const password = document.getElementById("password").value;
+
+    // Email Validation
+    const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+
+    // Phone Validation (10 digits)
+    const phonePattern = /^[0-9]{10}$/;
+
+    // Pincode Validation (6 digits)
+    const pincodePattern = /^[0-9]{6}$/;
+
+    // Validate Email
+    if(!emailPattern.test(email)){
+
+        message.className = "error";
+        message.innerHTML = "Enter valid email address";
+        return;
+
+    }
+
+    // Validate Phone
+    if(!phonePattern.test(phone)){
+
+        message.className = "error";
+        message.innerHTML = "Phone number must contain 10 digits";
+        return;
+
+    }
+
+    // Validate Pincode
+    if(!pincodePattern.test(pincode)){
+
+        message.className = "error";
+        message.innerHTML = "Pincode must contain 6 digits";
+        return;
+
+    }
+
+    // Password Validation
+    if(password.length < 6){
+
+        message.className = "error";
+        message.innerHTML = "Password must be at least 6 characters";
+        return;
+
+    }
+
+    message.innerHTML = "Adding distributor...";
+
+    const data = {
+
+        name:name,
+        email:email,
+        phone:phone,
+        city:city,
+        pincode:pincode,
+        address:address,
+        password:password
+
+    };
+
+    fetch("http://127.0.0.1:7000/add_distributor", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(data)
+
+    })
+
+    .then(response => response.json())
+
+    .then(result => {
+
+        message.className = "success";
+        message.innerHTML = result.message;
+
+        document.getElementById("distributorForm").reset();
+
+    })
+
+    .catch(error => {
+
+        console.log(error);
+
+        message.className = "error";
+        message.innerHTML = "Distributor could not be added";
+
+    });
+
+});
+</script>
+</body>
+</html>

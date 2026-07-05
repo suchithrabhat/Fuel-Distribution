@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial;
+}
+
+body{
+    display:flex;
+    background:#f1f5f9;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:270px;
+    height:100vh;
+    background:#0f172a;
+    position:fixed;
+    left:0;
+    top:0;
+    padding-top:30px;
+}
+
+.logo{
+    color:white;
+    text-align:center;
+    font-size:30px;
+    font-weight:bold;
+    margin-bottom:50px;
+}
+
+.sidebar a{
+    display:block;
+    color:white;
+    text-decoration:none;
+    padding:20px 35px;
+    font-size:19px;
+    transition:0.3s;
+}
+
+.sidebar a:hover{
+    background:#2563eb;
+    padding-left:45px;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:270px;
+    width:100%;
+    padding:60px;
+}
+
+.main h1{
+    font-size:45px;
+    color:#0f172a;
+    margin-bottom:20px;
+}
+
+.main p{
+    font-size:22px;
+    color:#555;
+}
+
+.dashboard-box{
+    background:white;
+    padding:50px;
+    border-radius:15px;
+    box-shadow:0px 0px 15px rgba(0,0,0,0.1);
+}
+
+</style>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <div class="logo">
+        Admin Panel
+    </div>
+
+    <a href="add_distributor.html">Add Distributor</a>
+
+    <a href="view_distributors.html">View Distributors</a>
+
+    <a href="view_customers.html">View Customers</a>
+
+    <a href="login.html">Logout</a>
+
+</div>
+
+<div class="main">
+
+    <div class="dashboard-box">
+
+        <h1>Welcome Admin</h1>
+
+        <p>
+            Fuel Distribution Management Dashboard
+        </p>
+
+    </div>
+
+</div>
+
+</body>
+</html>

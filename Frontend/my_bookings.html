@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Bookings</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="customer-panel.css">
+</head>
+
+<body>
+<div class="customer-shell">
+    <aside class="sidebar" aria-label="Customer navigation">
+        <div class="logo">Customer Panel</div>
+        <a href="view_distributor_customer.html">View Distributors</a>
+        <a href="my_bookings.html" class="active">My Bookings</a>
+        <a href="feedback.html">Give Feedback</a>
+        <a href="login.html">Logout</a>
+    </aside>
+
+    <main class="customer-main">
+        <section class="customer-page">
+            <header class="customer-header">
+                <div class="customer-title">
+                    <span class="customer-eyebrow">Booking Journey</span>
+                    <h1>My Bookings</h1>
+                    <p>Track fuel requests, delivery details, payment method, and distributor contact information.</p>
+                </div>
+
+                <div class="customer-stat" aria-live="polite">
+                    <div>
+                        <span>Total Bookings</span>
+                        <strong id="bookingCount">0</strong>
+                    </div>
+                    <div class="customer-stat-icon">MB</div>
+                </div>
+            </header>
+
+            <div class="customer-toolbar">
+                <label class="search-wrap" for="bookingSearch">
+                    <input id="bookingSearch" type="search" placeholder="Search bookings" autocomplete="off">
+                </label>
+            </div>
+
+            <div id="data" class="booking-grid">
+                <div class="state-card">
+                    <strong>Loading bookings</strong>
+                    Fetching your fuel requests.
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+const dataContainer = document.getElementById("data");
+const bookingCount = document.getElementById("bookingCount");
+const bookingSearch = document.getElementById("bookingSearch");
+let bookings = [];
+
+let customer_id = localStorage.getItem("customer_id");
+
+if (!customer_id) {
+    alert("Customer not logged in");
+    window.location.href = "login.html";
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function renderBookings(list) {
+    bookingCount.textContent = bookings.length;
+
+    if (list.length === 0) {
+        dataContainer.innerHTML = `
+            <div class="state-card">
+                <strong>No bookings found</strong>
+                Book fuel from a distributor to see it here.
+            </div>
+        `;
+        return;
+    }
+
+    dataContainer.innerHTML = list.map(booking => {
+        const status = escapeHtml(booking.status);
+
+        return `
+            <article class="booking-card">
+                <div class="booking-top">
+                    <div>
+                        <h3>${escapeHtml(booking.fuel_type)}</h3>
+                        <span>${escapeHtml(booking.liters)} Liters requested</span>
+                    </div>
+                    <span class="status-badge ${status}">${status}</span>
+                </div>
+
+                <div class="booking-body">
+                    <div class="detail">
+                        <span class="label">Total Price</span>
+                        <span class="value">₹${escapeHtml(booking.price)}</span>
+                    </div>
+                    <div class="detail">
+                        <span class="label">Payment</span>
+                        <span class="value">${escapeHtml(booking.payment_mode)}</span>
+                    </div>
+                    <div class="detail">
+                        <span class="label">Pincode</span>
+                        <span class="value">${escapeHtml(booking.pincode)}</span>
+                    </div>
+                    <div class="detail">
+                        <span class="label">Delivery Address</span>
+                        <span class="value">${escapeHtml(booking.address)}</span>
+                    </div>
+
+                    <div class="distributor-box">
+                        <div class="distributor-title">Distributor Details</div>
+                        <div class="detail">
+                            <span class="label">Name</span>
+                            <span class="value">${escapeHtml(booking.d_name)}</span>
+                        </div>
+                        <div class="detail">
+                            <span class="label">Email</span>
+                            <span class="value">${escapeHtml(booking.d_email)}</span>
+                        </div>
+                        <div class="detail">
+                            <span class="label">Phone</span>
+                            <span class="value">${escapeHtml(booking.d_phone)}</span>
+                        </div>
+                        <div class="detail">
+                            <span class="label">Address</span>
+                            <span class="value">${escapeHtml(booking.d_address)}</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        `;
+    }).join("");
+}
+
+function filterBookings() {
+    const query = bookingSearch.value.trim().toLowerCase();
+
+    if (!query) {
+        renderBookings(bookings);
+        return;
+    }
+
+    const filtered = bookings.filter(booking => {
+        return [
+            booking.fuel_type,
+            booking.liters,
+            booking.price,
+            booking.payment_mode,
+            booking.pincode,
+            booking.address,
+            booking.status,
+            booking.d_name,
+            booking.d_email,
+            booking.d_phone,
+            booking.d_address
+        ].some(value => String(value ?? "").toLowerCase().includes(query));
+    });
+
+    renderBookings(filtered);
+}
+
+fetch(`http://127.0.0.1:7000/view_bookings/${customer_id}`)
+    .then(res => res.json())
+    .then(data => {
+        bookings = Array.isArray(data) ? data : [];
+        filterBookings();
+    })
+    .catch(err => {
+        console.log(err);
+        dataContainer.innerHTML = `
+            <div class="error">
+                <strong>Error loading bookings</strong>
+                Check that the backend server is running.
+            </div>
+        `;
+    });
+
+bookingSearch.addEventListener("input", filterBookings);
+</script>
+</body>
+</html>

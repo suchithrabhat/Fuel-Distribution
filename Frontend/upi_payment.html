@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UPI Payment</title>
+<link rel="stylesheet" href="styles.css">
+
+<style>
+body {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: clamp(18px, 4vw, 42px);
+}
+
+.payment-shell {
+    width: min(980px, 100%);
+    display: grid;
+    grid-template-columns: minmax(300px, 0.9fr) minmax(0, 1fr);
+    gap: clamp(20px, 4vw, 40px);
+    align-items: stretch;
+}
+
+.upi-visual,
+.payment-card,
+.loading,
+.success {
+    border: 1px solid var(--line);
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: var(--shadow-md);
+}
+
+.upi-visual {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    align-content: space-between;
+    gap: 24px;
+    min-height: 560px;
+    background:
+        radial-gradient(circle at 80% 14%, rgba(245, 158, 11, 0.25), transparent 12rem),
+        linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(37, 99, 235, 0.86));
+    color: #ffffff;
+    padding: clamp(24px, 4vw, 40px);
+}
+
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 14px;
+    color: #bfdbfe;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.eyebrow::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #22c55e;
+    box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.16);
+}
+
+.upi-visual h1 {
+    color: #ffffff !important;
+    font-size: clamp(34px, 5vw, 58px) !important;
+    line-height: 1 !important;
+    margin-bottom: 12px;
+}
+
+.upi-visual p {
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.75;
+}
+
+.qr-card {
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 26px;
+}
+
+.qr-card img {
+    width: min(100%, 210px);
+    border-radius: 18px;
+    background: #ffffff;
+    padding: 16px;
+}
+
+.payment-card {
+    display: grid;
+    align-content: center;
+    gap: 22px;
+    padding: clamp(24px, 4vw, 42px);
+}
+
+.payment-card h2 {
+    margin-bottom: 8px;
+}
+
+.payment-card > p {
+    color: var(--muted);
+}
+
+.amount {
+    border-radius: 20px;
+    background:
+        radial-gradient(circle at right top, rgba(20, 184, 166, 0.18), transparent 9rem),
+        #f8fafc;
+    padding: 20px;
+}
+
+.amount span {
+    display: block;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 850;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.amount strong {
+    display: block;
+    margin-top: 6px;
+    color: var(--ink);
+    font-size: clamp(34px, 5vw, 52px);
+    line-height: 1;
+}
+
+.secure-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.secure-item {
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    background: #ffffff;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 850;
+    padding: 12px;
+    text-align: center;
+}
+
+.pay-button {
+    min-height: 52px;
+    background: linear-gradient(135deg, #14b8a6, #2563eb) !important;
+}
+
+.loading,
+.success {
+    display: none;
+    width: min(520px, 100%);
+    padding: clamp(28px, 5vw, 48px);
+    text-align: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #dbeafe;
+    border-top: 4px solid #2563eb;
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.tick {
+    display: grid;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 18px;
+    place-items: center;
+    border-radius: 999px;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 42px;
+    font-weight: 900;
+}
+
+@media (max-width: 860px) {
+    .payment-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .upi-visual {
+        min-height: auto;
+    }
+}
+
+@media (max-width: 520px) {
+    .secure-row {
+        grid-template-columns: 1fr;
+    }
+
+    .upi-visual,
+    .payment-card,
+    .loading,
+    .success {
+        border-radius: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+<main class="payment-shell" id="paymentShell">
+    <aside class="upi-visual">
+        <div>
+            <span class="eyebrow">Standard UPI Checkout</span>
+            <h1>Complete your secure UPI payment.</h1>
+            <p>Confirm the amount, enter your UPI ID, and your fuel booking will be created after payment.</p>
+        </div>
+
+        <div class="qr-card">
+            <img src="upi.png" alt="UPI payment QR">
+        </div>
+    </aside>
+
+    <section class="payment-card" id="formBox">
+        <div>
+            <h2>UPI Payment</h2>
+            <p>Use any UPI app to approve the payment request.</p>
+        </div>
+
+        <div class="amount">
+            <span>Total Amount</span>
+            <strong id="amountBox">₹0</strong>
+        </div>
+
+        <label>
+            UPI ID
+            <input type="text" id="upiid" placeholder="example@upi" autocomplete="off">
+        </label>
+
+        <div class="secure-row" aria-label="Payment features">
+            <div class="secure-item">Instant</div>
+            <div class="secure-item">Secure</div>
+            <div class="secure-item">Verified</div>
+        </div>
+
+        <button class="pay-button" onclick="payNow()">Pay Now</button>
+    </section>
+</main>
+
+<section class="loading" id="loadingBox">
+    <div class="spinner"></div>
+    <h2>Processing Payment</h2>
+    <p>Please wait while we confirm your UPI payment and create your booking.</p>
+</section>
+
+<section class="success" id="successBox">
+    <div class="tick">✓</div>
+    <h2>Payment Successful</h2>
+    <p>Redirecting to My Bookings...</p>
+</section>
+
+<script>
+let booking = JSON.parse(localStorage.getItem("booking") || "{}");
+
+if (!booking.total) {
+    booking.total = 0;
+}
+
+document.getElementById("amountBox").innerText = "₹ " + booking.total;
+
+function payNow() {
+    let upi = document.getElementById("upiid").value;
+
+    if (!upi) {
+        alert("Enter UPI ID");
+        return;
+    }
+
+    document.getElementById("paymentShell").style.display = "none";
+    document.getElementById("loadingBox").style.display = "block";
+
+    setTimeout(() => {
+        createBooking().then(() => {
+            document.getElementById("loadingBox").style.display = "none";
+            document.getElementById("successBox").style.display = "block";
+
+            setTimeout(() => {
+                localStorage.setItem("openBookings", "true");
+                window.location.href = "my_bookings.html";
+            }, 2000);
+        });
+    }, 2000);
+}
+
+function createBooking() {
+    return fetch("http://127.0.0.1:7000/create_booking", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            customer_id: localStorage.getItem("customer_id"),
+            distributor_id: booking.distributor_id,
+            fuel_type: booking.fuel,
+            liters: booking.liters,
+            price: booking.total,
+            date: booking.date,
+            pincode: booking.pincode,
+            address: booking.address,
+            payment_mode: "UPI"
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("Booking saved:", data);
+    })
+    .catch(err => {
+        console.log("Booking error:", err);
+    });
+}
+</script>
+</body>
+</html>

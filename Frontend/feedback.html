@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Give Feedback</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="customer-panel.css">
+</head>
+
+<body>
+<div class="customer-shell">
+    <aside class="sidebar" aria-label="Customer navigation">
+        <div class="logo">Customer Panel</div>
+        <a href="view_distributor_customer.html">View Distributors</a>
+        <a href="my_bookings.html">My Bookings</a>
+        <a href="feedback.html" class="active">Give Feedback</a>
+        <a href="login.html">Logout</a>
+    </aside>
+
+    <main class="customer-main">
+        <section class="customer-page">
+            <div class="feedback-shell">
+                <aside class="feedback-visual">
+                    <span class="customer-eyebrow">Service Feedback</span>
+                    <h1>Your experience helps improve every delivery.</h1>
+                    <p>
+                        Share a rating and short note about your fuel booking experience.
+                        Your feedback helps keep service transparent and reliable.
+                    </p>
+
+                    <div class="feedback-image">
+                        <img src="feedback.png" alt="Feedback illustration">
+                    </div>
+                </aside>
+
+                <div class="feedback-form-card">
+                    <h2>Give Feedback</h2>
+                    <p>Rate your experience and tell us what went well or what can be improved.</p>
+
+                    <div class="form-group">
+                        <label>Choose Rating</label>
+                        <div id="starRating" aria-label="Star rating">
+                            <span onclick="setRating(1)">★</span>
+                            <span onclick="setRating(2)">★</span>
+                            <span onclick="setRating(3)">★</span>
+                            <span onclick="setRating(4)">★</span>
+                            <span onclick="setRating(5)">★</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="comment">Describe Your Experience</label>
+                        <textarea id="comment" placeholder="Write your feedback here..."></textarea>
+                    </div>
+
+                    <button onclick="submitFeedback()">Submit Feedback</button>
+                    <p id="feedbackMessage"></p>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+let customer_id = localStorage.getItem("customer_id");
+
+if (!customer_id) {
+    alert("Customer not logged in");
+    window.location.href = "login.html";
+}
+
+let selectedRating = 0;
+
+function setRating(value) {
+    selectedRating = value;
+
+    let stars = document.querySelectorAll("#starRating span");
+
+    stars.forEach((star, index) => {
+        if (index < value) {
+            star.style.color = "#14b8a6";
+        } else {
+            star.style.color = "#cbd5e1";
+        }
+    });
+}
+
+function submitFeedback() {
+    const message = document.getElementById("feedbackMessage");
+    let comment = document.getElementById("comment").value;
+
+    if (selectedRating === 0 || comment === "") {
+        message.className = "error";
+        message.innerHTML = "Please choose a rating and write your feedback.";
+        return;
+    }
+
+    message.className = "";
+    message.innerHTML = "Submitting feedback...";
+
+    fetch("http://127.0.0.1:7000/add_feedback", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            customer_id: customer_id,
+            rating: selectedRating,
+            comment: comment
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        message.className = "success";
+        message.innerHTML = data.message;
+
+        selectedRating = 0;
+        document.getElementById("comment").value = "";
+
+        document.querySelectorAll("#starRating span").forEach(star => {
+            star.style.color = "#cbd5e1";
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        message.className = "error";
+        message.innerHTML = "Error submitting feedback";
+    });
+}
+</script>
+</body>
+</html>

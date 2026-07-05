@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us - Fuel Distribution</title>
+<link rel="stylesheet" href="styles.css">
+
+<style>
+body {
+    display: flex;
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+}
+
+.main {
+    width: calc(100% - 250px);
+    min-height: 100vh;
+    margin-left: 250px;
+    padding: clamp(24px, 4vw, 56px) !important;
+}
+
+.about-page {
+    width: min(1120px, 100%);
+    margin: 0 auto;
+}
+
+.about-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 0.82fr);
+    gap: clamp(24px, 5vw, 58px);
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.about-copy {
+    position: relative;
+}
+
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 18px;
+    border: 1px solid rgba(37, 99, 235, 0.18);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--brand);
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    padding: 8px 12px;
+    text-transform: uppercase;
+    box-shadow: var(--shadow-sm);
+}
+
+.eyebrow::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--success);
+    box-shadow: 0 0 0 5px rgba(5, 150, 105, 0.13);
+}
+
+.about-copy h1 {
+    max-width: 760px;
+    margin-bottom: 18px;
+    font-size: clamp(38px, 5.6vw, 68px) !important;
+    line-height: 1 !important;
+}
+
+.about-copy h1 span {
+    color: var(--brand);
+}
+
+.lead {
+    max-width: 680px;
+    color: #475569;
+    font-size: clamp(16px, 1.6vw, 19px);
+    line-height: 1.78;
+}
+
+.about-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.btn-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 850;
+    padding: 12px 18px;
+    text-decoration: none;
+    transition: transform 170ms ease, box-shadow 170ms ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--brand), #3b82f6);
+    color: #ffffff;
+    box-shadow: 0 16px 34px rgba(37, 99, 235, 0.28);
+}
+
+.btn-secondary {
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.76);
+    color: var(--ink);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-link:hover {
+    transform: translateY(-2px);
+}
+
+.about-visual {
+    position: relative;
+    overflow: hidden;
+    min-height: 500px;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: 28px;
+    background:
+        radial-gradient(circle at 82% 18%, rgba(245, 158, 11, 0.28), transparent 14rem),
+        linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(30, 64, 175, 0.9));
+    color: #ffffff;
+    padding: clamp(24px, 4vw, 38px);
+    box-shadow: 0 34px 75px rgba(15, 23, 42, 0.28);
+}
+
+.about-visual::after {
+    content: "";
+    position: absolute;
+    right: -80px;
+    bottom: -80px;
+    width: 250px;
+    height: 250px;
+    border-radius: 999px;
+    background: rgba(96, 165, 250, 0.18);
+}
+
+.visual-top {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 34px;
+}
+
+.visual-top span {
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.visual-top strong {
+    display: block;
+    margin-top: 4px;
+    color: #ffffff;
+    font-size: 26px;
+}
+
+.live-pill {
+    align-self: start;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.16);
+    color: #bbf7d0;
+    font-size: 12px;
+    font-weight: 850;
+    padding: 8px 11px;
+}
+
+.network-map {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    min-height: 240px;
+    margin-bottom: 28px;
+}
+
+.network-ring {
+    position: absolute;
+    width: min(78%, 310px);
+    aspect-ratio: 1;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+}
+
+.network-ring:nth-child(2) {
+    width: min(54%, 220px);
+}
+
+.network-core {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: 118px;
+    height: 118px;
+    place-items: center;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #f59e0b, #60a5fa);
+    color: #ffffff;
+    font-size: 34px;
+    font-weight: 900;
+    box-shadow: 0 20px 42px rgba(96, 165, 250, 0.26);
+}
+
+.node {
+    position: absolute;
+    z-index: 2;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(14px);
+}
+
+.node.one {
+    top: 18px;
+    left: 18%;
+}
+
+.node.two {
+    top: 54px;
+    right: 14%;
+}
+
+.node.three {
+    bottom: 28px;
+    left: 26%;
+}
+
+.metric-strip {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.metric {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 16px;
+}
+
+.metric strong {
+    display: block;
+    color: #ffffff;
+    font-size: 24px;
+    line-height: 1;
+}
+
+.metric span {
+    display: block;
+    margin-top: 7px;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 12px;
+    font-weight: 760;
+}
+
+.story-grid {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.story-card,
+.feature-card {
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: var(--shadow-sm);
+}
+
+.story-card {
+    padding: clamp(24px, 4vw, 34px);
+}
+
+.story-card h2 {
+    margin-bottom: 14px;
+}
+
+.story-card p {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.75;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.feature-card {
+    padding: 20px;
+}
+
+.feature-icon {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 14px;
+    place-items: center;
+    border-radius: 13px;
+    background: var(--brand-soft);
+    color: var(--brand);
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.feature-card h3 {
+    margin-bottom: 8px;
+    font-size: 18px !important;
+}
+
+.feature-card p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+@media (max-width: 1040px) {
+    .about-hero,
+    .story-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .about-visual {
+        min-height: 430px;
+    }
+}
+
+@media (max-width: 900px) {
+    body {
+        display: block;
+    }
+
+    .sidebar {
+        position: sticky;
+        width: 100%;
+        height: auto;
+    }
+
+    .main {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 640px) {
+    .about-copy h1 {
+        font-size: 40px !important;
+    }
+
+    .about-actions,
+    .feature-grid,
+    .metric-strip {
+        grid-template-columns: 1fr;
+    }
+
+    .about-actions {
+        display: grid;
+    }
+
+    .btn-link {
+        width: 100%;
+    }
+
+    .about-visual {
+        min-height: auto;
+        border-radius: 20px;
+    }
+
+    .network-map {
+        min-height: 210px;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="sidebar">
+    <div class="logo">Fuel Distribution</div>
+
+    <a href="home.html">Home</a>
+    <a href="login.html">Login</a>
+    <a href="register.html">Register</a>
+    <a href="view_feedback.html">View Feedbacks</a>
+    <a class="active" href="about_us.html">About Us</a>
+</div>
+
+<main class="main">
+    <section class="about-page">
+        <div class="about-hero">
+            <div class="about-copy">
+                <div class="eyebrow">About Fuel Distribution</div>
+                <h1>Connecting customers and distributors with <span>clarity.</span></h1>
+                <p class="lead">
+                    Fuel Distribution System is built to make fuel booking, supply updates,
+                    payment handling, and service feedback easier for everyone involved.
+                    The platform keeps the process organized, transparent, and fast.
+                </p>
+
+                <div class="about-actions">
+                    <a class="btn-link btn-primary" href="register.html">Get Started</a>
+                    <a class="btn-link btn-secondary" href="login.html">Login</a>
+                </div>
+            </div>
+
+            <aside class="about-visual" aria-label="Fuel distribution network preview">
+                <div class="visual-top">
+                    <div>
+                        <span>Network View</span>
+                        <strong>Reliable Service</strong>
+                    </div>
+                    <div class="live-pill">Active</div>
+                </div>
+
+                <div class="network-map">
+                    <i class="network-ring"></i>
+                    <i class="network-ring"></i>
+                    <i class="node one"></i>
+                    <i class="node two"></i>
+                    <i class="node three"></i>
+                    <div class="network-core">FD</div>
+                </div>
+
+                <div class="metric-strip">
+                    <div class="metric">
+                        <strong>24/7</strong>
+                        <span>Access</span>
+                    </div>
+                    <div class="metric">
+                        <strong>Fast</strong>
+                        <span>Booking</span>
+                    </div>
+                    <div class="metric">
+                        <strong>Live</strong>
+                        <span>Updates</span>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <div class="story-grid">
+            <article class="story-card">
+                <h2>Our Purpose</h2>
+                <p>
+                    We help customers request fuel without confusion and help distributors manage
+                    pricing, bookings, and demand from one place. The goal is a smoother digital
+                    workflow from registration to delivery.
+                </p>
+            </article>
+
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <div class="feature-icon">01</div>
+                    <h3>Fast Service</h3>
+                    <p>Simple booking screens help customers place fuel requests quickly.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">02</div>
+                    <h3>Secure Access</h3>
+                    <p>Separate login flows keep admin, distributor, and customer actions clear.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">03</div>
+                    <h3>Easy Tracking</h3>
+                    <p>Bookings, feedback, customers, distributors, and revenue stay organized.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">04</div>
+                    <h3>Reliable Flow</h3>
+                    <p>The platform connects requests, payment choices, and distributor response.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

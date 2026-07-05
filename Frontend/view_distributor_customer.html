@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Distributors</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="customer-panel.css">
+</head>
+
+<body>
+<div class="customer-shell">
+    <aside class="sidebar" aria-label="Customer navigation">
+        <div class="logo">Customer Panel</div>
+        <a href="view_distributor_customer.html" class="active">View Distributors</a>
+        <a href="my_bookings.html">My Bookings</a>
+        <a href="feedback.html">Give Feedback</a>
+        <a href="login.html">Logout</a>
+    </aside>
+
+    <main class="customer-main">
+        <section class="customer-page">
+            <header class="customer-header">
+                <div class="customer-title">
+                    <span class="customer-eyebrow">Fuel Partners</span>
+                    <h1>Choose a Distributor</h1>
+                    <p>Find a nearby fuel distributor by city, pincode, address, or name and start your booking.</p>
+                </div>
+
+                <div class="customer-stat" aria-live="polite">
+                    <div>
+                        <span>Available Partners</span>
+                        <strong id="distributorCount">0</strong>
+                    </div>
+                    <div class="customer-stat-icon">FD</div>
+                </div>
+            </header>
+
+            <div class="customer-toolbar">
+                <label class="search-wrap" for="search">
+                    <input type="search" id="search" placeholder="Search city, pincode, address" autocomplete="off">
+                </label>
+            </div>
+
+            <div id="container" class="distributor-grid">
+                <div class="state-card">
+                    <strong>Loading distributors</strong>
+                    Fetching available fuel partners.
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+const container = document.getElementById("container");
+const distributorCount = document.getElementById("distributorCount");
+const searchInput = document.getElementById("search");
+let allData = [];
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function render(data) {
+    distributorCount.textContent = allData.length;
+
+    if (data.length === 0) {
+        container.innerHTML = `
+            <div class="state-card">
+                <strong>No distributors found</strong>
+                Try another city, pincode, address, or name.
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = data.map(distributor => `
+        <article class="distributor-card">
+            <div class="distributor-top">
+                <div>
+                    <h3>${escapeHtml(distributor.name)}</h3>
+                    <span>${escapeHtml(distributor.city)} · ${escapeHtml(distributor.pincode)}</span>
+                </div>
+            </div>
+
+            <div class="distributor-body">
+                <div class="detail">
+                    <span class="label">Email</span>
+                    <span class="value">${escapeHtml(distributor.email)}</span>
+                </div>
+                <div class="detail">
+                    <span class="label">Phone</span>
+                    <span class="value">${escapeHtml(distributor.phone)}</span>
+                </div>
+                <div class="detail">
+                    <span class="label">Address</span>
+                    <span class="value">${escapeHtml(distributor.address)}</span>
+                </div>
+
+                <button class="book-btn" onclick="book(${Number(distributor.id)})">Book Fuel</button>
+            </div>
+        </article>
+    `).join("");
+}
+
+function filterDistributors() {
+    const value = searchInput.value.trim().toLowerCase();
+
+    if (!value) {
+        render(allData);
+        return;
+    }
+
+    const filtered = allData.filter(distributor => {
+        return [
+            distributor.city,
+            distributor.pincode,
+            distributor.address,
+            distributor.name,
+            distributor.email,
+            distributor.phone
+        ].some(item => String(item ?? "").toLowerCase().includes(value));
+    });
+
+    render(filtered);
+}
+
+fetch("http://127.0.0.1:7000/view_distributors")
+    .then(res => res.json())
+    .then(data => {
+        allData = Array.isArray(data) ? data : [];
+        render(allData);
+    })
+    .catch(error => {
+        console.log(error);
+        container.innerHTML = `
+            <div class="error">
+                <strong>Distributors could not be loaded</strong>
+                Check that the backend server is running.
+            </div>
+        `;
+    });
+
+searchInput.addEventListener("input", filterDistributors);
+
+function book(id) {
+    localStorage.setItem("selected_distributor", id);
+    window.location.href = "book_fuel.html";
+}
+</script>
+</body>
+</html>

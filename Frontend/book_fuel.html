@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Fuel</title>
+<link rel="stylesheet" href="styles.css">
+
+<style>
+body {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: clamp(18px, 4vw, 42px);
+}
+
+.checkout-shell {
+    width: min(1120px, 100%);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+    gap: clamp(20px, 4vw, 42px);
+    align-items: stretch;
+}
+
+.booking-card,
+.summary-card {
+    border: 1px solid var(--line);
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: var(--shadow-md);
+    padding: clamp(24px, 4vw, 42px);
+}
+
+.booking-card {
+    display: grid;
+    gap: 24px;
+}
+
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 12px;
+    color: #0f766e;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.eyebrow::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #14b8a6;
+    box-shadow: 0 0 0 5px rgba(20, 184, 166, 0.14);
+}
+
+.booking-card h1 {
+    margin-bottom: 10px;
+    font-size: clamp(34px, 5vw, 58px) !important;
+    line-height: 1 !important;
+}
+
+.booking-card p {
+    max-width: 620px;
+    color: var(--muted);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.field {
+    display: grid;
+    gap: 7px;
+}
+
+.field.full {
+    grid-column: 1 / -1;
+}
+
+.readonly-input {
+    background: #f8fafc !important;
+    color: #475569 !important;
+}
+
+.summary-card {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    align-content: space-between;
+    gap: 22px;
+    background:
+        radial-gradient(circle at 85% 12%, rgba(245, 158, 11, 0.24), transparent 12rem),
+        linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(15, 118, 110, 0.88));
+    color: #ffffff;
+}
+
+.summary-card h2 {
+    margin-bottom: 8px;
+    color: #ffffff !important;
+}
+
+.summary-card p {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.price-stack {
+    display: grid;
+    gap: 12px;
+}
+
+.price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+}
+
+.price-row span {
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 13px;
+    font-weight: 850;
+}
+
+.price-row strong {
+    color: #ffffff;
+    font-size: 24px;
+}
+
+.total-row {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.payment-method {
+    display: grid;
+    gap: 8px;
+}
+
+.checkout-note {
+    color: rgba(255, 255, 255, 0.64);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.book-button {
+    width: 100%;
+    min-height: 52px;
+    background: linear-gradient(135deg, #14b8a6, #2563eb) !important;
+}
+
+@media (max-width: 900px) {
+    .checkout-shell {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 620px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-card,
+    .summary-card {
+        border-radius: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+<main class="checkout-shell">
+    <section class="booking-card">
+        <div>
+            <span class="eyebrow">Fuel Checkout</span>
+            <h1>Book fuel with a clean checkout.</h1>
+            <p>Enter fuel quantity, delivery details, and payment mode. Service is currently available for pincode 570004.</p>
+        </div>
+
+        <div class="form-grid">
+            <label class="field">
+                Date
+                <input class="readonly-input" type="text" id="date" readonly>
+            </label>
+
+            <label class="field">
+                Fuel Type
+                <select id="fuel" onchange="loadPrice()">
+                    <option value="">Select fuel</option>
+                    <option value="Petrol">Petrol</option>
+                    <option value="Diesel">Diesel</option>
+                </select>
+            </label>
+
+            <label class="field">
+                Liters
+                <input type="number" id="liters" min="3" placeholder="Minimum 3 liters" oninput="calc()">
+            </label>
+
+            <label class="field">
+                Pincode
+                <input type="text" id="pincode" placeholder="570004" maxlength="6" pattern="570004" required>
+            </label>
+
+            <label class="field full">
+                Delivery Address
+                <input type="text" id="address" placeholder="Enter delivery address">
+            </label>
+        </div>
+    </section>
+
+    <aside class="summary-card">
+        <div>
+            <h2>Order Summary</h2>
+            <p>Review pricing before continuing to payment.</p>
+        </div>
+
+        <div class="price-stack">
+            <div class="price-row">
+                <span>Price per Liter</span>
+                <strong id="priceBox">₹0</strong>
+            </div>
+
+            <div class="price-row total-row">
+                <span>Total Amount</span>
+                <strong id="totalBox">₹0</strong>
+            </div>
+        </div>
+
+        <label class="payment-method">
+            Payment Mode
+            <select id="payment">
+                <option value="upi">UPI Payment</option>
+                <option value="card">Card Payment</option>
+            </select>
+        </label>
+
+        <p class="checkout-note">
+            Your booking will be created after successful payment confirmation.
+        </p>
+
+        <button class="book-button" onclick="book()">Continue to Payment</button>
+    </aside>
+</main>
+
+<script>
+let price = 0;
+
+document.getElementById("date").value = new Date().toLocaleDateString();
+
+function loadPrice() {
+    fetch("http://127.0.0.1:7000/view_fuel_prices")
+        .then(res => res.json())
+        .then(data => {
+            let fuel = document.getElementById("fuel").value;
+            let found = data.find(f => f.fuel_type === fuel);
+
+            if (found) {
+                price = found.price;
+                document.getElementById("priceBox").innerText = "₹ " + price;
+                calc();
+            } else {
+                price = 0;
+                document.getElementById("priceBox").innerText = "₹0";
+                calc();
+            }
+        });
+}
+
+function calc() {
+    let liters = document.getElementById("liters").value || 0;
+    document.getElementById("totalBox").innerText = "₹ " + (liters * price);
+}
+
+function book() {
+    let fuel = document.getElementById("fuel").value;
+    let liters = document.getElementById("liters").value;
+    let pincode = document.getElementById("pincode").value;
+    let address = document.getElementById("address").value;
+
+    if (!fuel) {
+        alert("Select fuel type");
+        return;
+    }
+
+    if (liters < 3) {
+        alert("Minimum 3 liters required");
+        return;
+    }
+
+    if (!/^[0-9]{6}$/.test(pincode)) {
+        alert("Pincode must contain 6 digits");
+        return;
+    }
+
+    if (pincode !== "570004") {
+        alert("Service available only for pincode 570004");
+        return;
+    }   
+
+    if (!address) {
+        alert("Enter delivery address");
+        return;
+    }
+
+    let booking = {
+        date: document.getElementById("date").value,
+        fuel: fuel,
+        liters: liters,
+        price: price,
+        total: liters * price,
+        pincode: pincode,
+        address: address,
+        payment: document.getElementById("payment").value,
+        distributor_id: localStorage.getItem("selected_distributor"),
+        customer_id: localStorage.getItem("customer_id")
+    };
+
+    localStorage.setItem("booking", JSON.stringify(booking));
+
+    if (booking.payment === "upi") {
+        window.location.href = "upi_payment.html";
+    } else {
+        window.location.href = "card_payment.html";
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Fuel Price</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="distributor-panel.css">
+</head>
+
+<body>
+<div class="dist-shell">
+    <aside class="sidebar" aria-label="Distributor navigation">
+        <div class="logo">Distributor Panel</div>
+        <a href="add_fuel_price.html" class="active">Add Fuel Price</a>
+        <a href="view_fuel_prices.html">View Fuel Price</a>
+        <a href="view_bookings.html">View Bookings</a>
+        <a href="view_revenue.html">View Revenue</a>
+        <a href="login.html">Logout</a>
+    </aside>
+
+    <main class="dist-main">
+        <section class="dist-page">
+            <header class="dist-header">
+                <div class="dist-title">
+                    <span class="dist-eyebrow">Supply Pricing</span>
+                    <h1 id="heading">Add Fuel Price</h1>
+                    <p>Publish fuel prices so customers always see current supply rates before booking.</p>
+                </div>
+
+                <div class="dist-stat">
+                    <div>
+                        <span>Pricing Mode</span>
+                        <strong id="modeLabel">Create</strong>
+                    </div>
+                    <div class="dist-stat-icon">₹</div>
+                </div>
+            </header>
+
+            <div class="dist-grid">
+                <div class="dist-card">
+                    <h2>Fuel Rate</h2>
+                    <p>Select the fuel type and enter the latest price per liter.</p>
+
+                    <form id="fuelForm" class="fuel-form">
+                        <label class="field">
+                            Fuel Type
+                            <select id="fuel_type" required>
+                                <option value="">Select Fuel Type</option>
+                                <option value="Petrol">Petrol</option>
+                                <option value="Diesel">Diesel</option>
+                            </select>
+                        </label>
+
+                        <label class="field">
+                            Price Per Liter
+                            <div class="price-input">
+                                <span>₹</span>
+                                <input type="number" id="price" placeholder="Enter price" min="1" required>
+                            </div>
+                        </label>
+
+                        <button type="submit" id="btn">Add Fuel Price</button>
+                    </form>
+
+                    <p id="message"></p>
+                </div>
+
+                <aside class="fuel-visual">
+                    <h2>Live supply board</h2>
+                    <p>Keep Petrol and Diesel pricing fresh. Customers rely on this rate when confirming their orders.</p>
+
+                    <div class="gauge" aria-hidden="true">
+                        <strong>86%</strong>
+                    </div>
+                </aside>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+let updateId = null;
+
+const params = new URLSearchParams(window.location.search);
+
+if (params.has("id")) {
+    updateId = params.get("id");
+
+    document.getElementById("heading").innerHTML = "Update Fuel Price";
+    document.getElementById("btn").innerHTML = "Update Fuel Price";
+    document.getElementById("modeLabel").innerHTML = "Update";
+
+    fetch(`http://127.0.0.1:7000/get_fuel_price/${updateId}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("fuel_type").value = data.fuel_type;
+            document.getElementById("price").value = data.price;
+        });
+}
+
+document.getElementById("fuelForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const message = document.getElementById("message");
+    message.className = "";
+    message.innerHTML = updateId === null ? "Adding fuel price..." : "Updating fuel price...";
+
+    const data = {
+        fuel_type: document.getElementById("fuel_type").value,
+        price: document.getElementById("price").value
+    };
+
+    if (updateId == null) {
+        fetch("http://127.0.0.1:7000/add_fuel_price", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(result => {
+            message.innerHTML = result.message;
+
+            if (result.status == "success") {
+                message.className = "success";
+                document.getElementById("fuelForm").reset();
+            } else {
+                message.className = "error";
+            }
+        });
+    } else {
+        fetch(`http://127.0.0.1:7000/update_fuel_price/${updateId}`, {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(result => {
+            alert(result.message);
+            window.location.href = "view_fuel_prices.html";
+        });
+    }
+});
+</script>
+</body>
+</html>

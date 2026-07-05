@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Revenue</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="distributor-panel.css">
+</head>
+
+<body>
+<div class="dist-shell">
+    <aside class="sidebar" aria-label="Distributor navigation">
+        <div class="logo">Distributor Panel</div>
+        <a href="add_fuel_price.html">Add Fuel Price</a>
+        <a href="view_fuel_prices.html">View Fuel Price</a>
+        <a href="view_bookings.html">View Bookings</a>
+        <a href="view_revenue.html" class="active">View Revenue</a>
+        <a href="login.html">Logout</a>
+    </aside>
+
+    <main class="dist-main">
+        <section class="dist-page">
+            <header class="dist-header">
+                <div class="dist-title">
+                    <span class="dist-eyebrow">Revenue Console</span>
+                    <h1>Revenue</h1>
+                    <p>Track accepted booking revenue grouped by date and fuel type.</p>
+                </div>
+
+                <div class="dist-stat" aria-live="polite">
+                    <div>
+                        <span>Revenue Rows</span>
+                        <strong id="revenueCount">0</strong>
+                    </div>
+                    <div class="dist-stat-icon">RV</div>
+                </div>
+            </header>
+
+            <div class="revenue-hero">
+                <div class="revenue-card">
+                    <span>Total Revenue</span>
+                    <strong id="totalRevenue">₹0</strong>
+                </div>
+
+                <div class="fuel-visual">
+                    <h2>Accepted orders only</h2>
+                    <p>Revenue is calculated from bookings that were accepted by the distributor.</p>
+                </div>
+            </div>
+
+            <section class="table-box" aria-label="Revenue table">
+                <div class="table-scroll">
+                    <table class="dist-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Fuel Type</th>
+                                <th>Total Quantity</th>
+                                <th>Total Revenue</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tableData">
+                            <tr>
+                                <td colspan="4" class="state-cell">
+                                    <strong>Loading revenue</strong>
+                                    Fetching accepted booking totals.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+    </main>
+</div>
+
+<script>
+const tableData = document.getElementById("tableData");
+const totalRevenueBox = document.getElementById("totalRevenue");
+const revenueCount = document.getElementById("revenueCount");
+
+let distributor_id = localStorage.getItem("distributor_id");
+
+if (!distributor_id) {
+    alert("Distributor not logged in");
+    window.location.href = "login.html";
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+fetch(`http://127.0.0.1:7000/view_revenue/${distributor_id}`)
+    .then(res => res.json())
+    .then(data => {
+        const rows = Array.isArray(data) ? data : [];
+        let totalRevenue = 0;
+
+        revenueCount.textContent = rows.length;
+
+        if (rows.length === 0) {
+            tableData.innerHTML = `
+                <tr>
+                    <td colspan="4" class="state-cell">
+                        <strong>No revenue found</strong>
+                        Accepted bookings will appear here.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tableData.innerHTML = rows.map(row => {
+            totalRevenue += Number(row.total_price);
+
+            return `
+                <tr>
+                    <td data-label="Date">${escapeHtml(row.date)}</td>
+                    <td data-label="Fuel Type"><span class="fuel-pill">${escapeHtml(row.fuel_type)}</span></td>
+                    <td data-label="Total Quantity">${escapeHtml(row.total_quantity)} Liters</td>
+                    <td data-label="Total Revenue" class="revenue-cell">₹${escapeHtml(row.total_price)}</td>
+                </tr>
+            `;
+        }).join("");
+
+        totalRevenueBox.innerHTML = `₹${totalRevenue}`;
+    })
+    .catch(err => {
+        console.log(err);
+        tableData.innerHTML = `
+            <tr>
+                <td colspan="4" class="state-cell error">
+                    <strong>Error loading revenue</strong>
+                    Check that the backend server is running.
+                </td>
+            </tr>
+        `;
+    });
+</script>
+</body>
+</html>

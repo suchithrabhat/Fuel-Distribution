@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Panel</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    display:flex;
+    background:#f1f5f9;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:250px;
+    height:100vh;
+    background:#0f172a;
+    color:white;
+    padding-top:30px;
+    position:fixed;
+    left:0;
+    top:0;
+}
+
+.sidebar h2{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.sidebar a{
+    display:block;
+    padding:15px 20px;
+    color:white;
+    text-decoration:none;
+    cursor:pointer;
+    transition:0.3s;
+    font-size:16px;
+}
+
+.sidebar a:hover,
+.sidebar a.active{
+    background:#2563eb;
+}
+
+/* MAIN */
+
+.main{
+    margin-left:250px;
+    width:100%;
+    padding:40px;
+}
+
+.welcome-box{
+    background:white;
+    padding:40px;
+    border-radius:14px;
+    box-shadow:0 0 12px rgba(0,0,0,0.08);
+}
+
+.welcome-box h1{
+    color:#0f172a;
+    margin-bottom:10px;
+}
+
+.welcome-box p{
+    color:#64748b;
+    font-size:16px;
+}
+
+</style>
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <h2>Customer Panel</h2>
+
+    <a href="view_distributor_customer.html">
+        View Distributors
+    </a>
+
+    <a href="my_bookings.html">
+        My Bookings
+    </a>
+
+    <a href="feedback.html">
+        Give Feedback
+    </a>
+
+    <a href="login.html">
+        Logout
+    </a>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+    <div class="welcome-box">
+
+        <h1>Welcome Customer 👋</h1>
+
+        <p>
+            Use the sidebar to view distributors,
+            book fuel and track your bookings.
+        </p>
+
+    </div>
+
+</div>
+
+</body>
+</html>

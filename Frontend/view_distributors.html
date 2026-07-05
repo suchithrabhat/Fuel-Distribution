@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Distributors</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin-panel.css">
+</head>
+
+<body>
+<div class="admin-shell">
+    <aside class="sidebar" aria-label="Admin navigation">
+        <div class="logo">Admin Panel</div>
+        <a href="add_distributor.html">Add Distributor</a>
+        <a href="view_distributors.html" class="active">View Distributors</a>
+        <a href="view_customers.html">View Customers</a>
+        <a href="login.html">Logout</a>
+    </aside>
+
+    <main class="admin-main">
+        <section class="admin-page">
+            <header class="admin-header">
+                <div class="admin-title">
+                    <span class="admin-eyebrow">Distributor Directory</span>
+                    <h1>View Distributors</h1>
+                    <p>Manage distributor records, service locations, contact details, and removal actions.</p>
+                </div>
+
+                <div class="admin-stat" aria-live="polite">
+                    <div>
+                        <span>Total Distributors</span>
+                        <strong id="distributorCount">0</strong>
+                    </div>
+                    <div class="admin-stat-icon">DS</div>
+                </div>
+            </header>
+
+            <div class="admin-toolbar">
+                <label class="search-wrap" for="distributorSearch">
+                    <input id="distributorSearch" type="search" placeholder="Search distributors" autocomplete="off">
+                </label>
+            </div>
+
+            <section class="table-box" aria-label="Distributor table">
+                <div class="table-scroll">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>City</th>
+                                <th>Pincode</th>
+                                <th>Address</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tableBody">
+                            <tr>
+                                <td colspan="8" class="state-cell">
+                                    <strong>Loading distributors</strong>
+                                    Fetching the latest records.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+    </main>
+</div>
+
+<script>
+const tableBody = document.getElementById("tableBody");
+const distributorCount = document.getElementById("distributorCount");
+const distributorSearch = document.getElementById("distributorSearch");
+let distributors = [];
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function renderDistributors(list) {
+    distributorCount.textContent = distributors.length;
+
+    if (list.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="8" class="state-cell">
+                    <strong>No distributors found</strong>
+                    Try adjusting your search.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tableBody.innerHTML = list.map(distributor => `
+        <tr>
+            <td data-label="ID"><span class="id-pill">${escapeHtml(distributor.id)}</span></td>
+            <td data-label="Name" class="name-cell">${escapeHtml(distributor.name)}</td>
+            <td data-label="Email" class="muted-cell">${escapeHtml(distributor.email)}</td>
+            <td data-label="Phone">${escapeHtml(distributor.phone)}</td>
+            <td data-label="City">${escapeHtml(distributor.city)}</td>
+            <td data-label="Pincode">${escapeHtml(distributor.pincode)}</td>
+            <td data-label="Address">${escapeHtml(distributor.address)}</td>
+            <td data-label="Action" class="action-cell">
+                <button class="delete-btn" onclick="deleteDistributor(${Number(distributor.id)})">Delete</button>
+            </td>
+        </tr>
+    `).join("");
+}
+
+function filterDistributors() {
+    const query = distributorSearch.value.trim().toLowerCase();
+
+    if (!query) {
+        renderDistributors(distributors);
+        return;
+    }
+
+    const filtered = distributors.filter(distributor => {
+        return [
+            distributor.id,
+            distributor.name,
+            distributor.email,
+            distributor.phone,
+            distributor.city,
+            distributor.pincode,
+            distributor.address
+        ].some(value => String(value ?? "").toLowerCase().includes(query));
+    });
+
+    renderDistributors(filtered);
+}
+
+function loadDistributors() {
+    fetch("http://127.0.0.1:7000/view_distributors")
+        .then(response => response.json())
+        .then(data => {
+            distributors = Array.isArray(data) ? data : [];
+            filterDistributors();
+        })
+        .catch(error => {
+            console.log(error);
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="state-cell error">
+                        <strong>Distributors could not be loaded</strong>
+                        Check that the backend server is running.
+                    </td>
+                </tr>
+            `;
+        });
+}
+
+function deleteDistributor(id) {
+    if (confirm("Are you sure you want to delete this distributor?")) {
+        fetch(`http://127.0.0.1:7000/delete_distributor/${id}`, {
+            method: "DELETE"
+        })
+        .then(response => response.json())
+        .then(result => {
+            alert(result.message);
+            loadDistributors();
+        });
+    }
+}
+
+distributorSearch.addEventListener("input", filterDistributors);
+loadDistributors();
+</script>
+</body>
+</html>

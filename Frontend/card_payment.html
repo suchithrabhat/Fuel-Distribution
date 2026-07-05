@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Payment</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+body {
+    display: grid !important;
+    place-items: center;
+    padding: 24px;
+}
+
+.payment-shell {
+    width: min(100%, 460px);
+}
+
+.payment-card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-md);
+    padding: clamp(24px, 4vw, 38px);
+}
+
+.payment-card h2 {
+    margin-bottom: 8px;
+}
+
+.payment-card p {
+    margin-bottom: 24px;
+}
+
+.card-preview {
+    min-height: 170px;
+    margin-bottom: 24px;
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at 85% 20%, rgba(245, 158, 11, 0.58), transparent 7rem),
+        linear-gradient(135deg, #0f172a, #1d4ed8);
+    color: #ffffff;
+    padding: 22px;
+    box-shadow: 0 22px 42px rgba(15, 23, 42, 0.24);
+}
+
+.card-preview span {
+    display: block;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.card-preview strong {
+    display: block;
+    margin-top: 42px;
+    font-size: 21px;
+    letter-spacing: 0.08em;
+}
+
+.card-row {
+    display: grid;
+    grid-template-columns: 1fr 120px;
+    gap: 14px;
+}
+
+@media (max-width: 480px) {
+    .card-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+<main class="payment-shell">
+    <section class="payment-card">
+        <div class="card-preview">
+            <span>Secure Card</span>
+            <strong>**** **** **** 2408</strong>
+        </div>
+
+        <h2>Card Payment</h2>
+        <p>Enter your card details to complete the booking.</p>
+
+        <form onsubmit="event.preventDefault(); pay();">
+            <label>
+                Name on Card
+                <input id="cardName" placeholder="Enter card holder name" autocomplete="cc-name" required>
+            </label>
+
+            <label>
+                Card Number
+                <input id="cardNumber" placeholder="1234 5678 9012 3456" inputmode="numeric" autocomplete="cc-number" required>
+            </label>
+
+            <div class="card-row">
+                <label>
+                    Expiry
+                    <input id="expiry" placeholder="MM/YY" autocomplete="cc-exp" required>
+                </label>
+
+                <label>
+                    CVV
+                    <input id="cvv" placeholder="123" inputmode="numeric" autocomplete="cc-csc" required>
+                </label>
+            </div>
+
+            <button type="submit">Pay Now</button>
+        </form>
+    </section>
+</main>
+
+<script>
+function pay() {
+    const booking = JSON.parse(localStorage.getItem("booking") || "{}");
+
+    setTimeout(() => {
+        fetch("http://127.0.0.1:7000/create_booking", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                customer_id: booking.customer_id,
+                distributor_id: booking.distributor_id,
+                fuel_type: booking.fuel,
+                liters: booking.liters,
+                price: booking.total,
+                date: booking.date,
+                pincode: booking.pincode,
+                address: booking.address,
+                payment_mode: "CARD"
+            })
+        });
+
+        localStorage.setItem("openBookings", "true");
+        window.location.href = "my_bookings.html";
+    }, 1200);
+}
+</script>
+</body>
+</html>

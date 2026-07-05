@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Feedback</title>
+<link rel="stylesheet" href="styles.css">
+
+<style>
+body {
+    display: flex;
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+}
+
+.main {
+    width: calc(100% - 250px);
+    min-height: 100vh;
+    margin-left: 250px;
+    padding: clamp(24px, 4vw, 56px) !important;
+}
+
+.feedback-page {
+    width: min(1120px, 100%);
+    margin: 0 auto;
+}
+
+.page-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+    gap: 22px;
+    align-items: end;
+    margin-bottom: 24px;
+}
+
+.eyebrow {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: var(--brand);
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.header-copy h1 {
+    margin-bottom: 8px;
+}
+
+.header-copy p {
+    max-width: 620px;
+    color: var(--muted);
+    font-size: 15px;
+}
+
+.summary-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    min-height: 92px;
+    padding: 18px !important;
+}
+
+.summary-card span {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.summary-card strong {
+    display: block;
+    margin-top: 2px;
+    color: var(--ink);
+    font-size: 34px;
+    line-height: 1;
+}
+
+.summary-icon {
+    display: grid;
+    width: 46px;
+    height: 46px;
+    place-items: center;
+    border-radius: 14px;
+    background: #fff7ed;
+    color: var(--accent);
+    font-size: 22px;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+}
+
+.search-wrap {
+    position: relative;
+    width: min(100%, 360px);
+}
+
+.search-wrap::before {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    width: 13px;
+    height: 13px;
+    border: 2px solid var(--muted);
+    border-radius: 50%;
+    transform: translateY(-50%);
+}
+
+.search-wrap::after {
+    content: "";
+    position: absolute;
+    left: 28px;
+    top: 30px;
+    width: 7px;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--muted);
+    transform: rotate(45deg);
+}
+
+.search-wrap input {
+    padding-left: 42px !important;
+}
+
+.table-box {
+    overflow: hidden;
+}
+
+.table-scroll {
+    overflow-x: auto;
+}
+
+table {
+    min-width: 780px;
+}
+
+th {
+    white-space: nowrap;
+}
+
+.user-cell {
+    color: var(--ink);
+    font-weight: 850;
+}
+
+.email-cell {
+    color: var(--muted);
+}
+
+.rating {
+    color: var(--accent) !important;
+    font-size: 18px !important;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+.comment {
+    max-width: 420px;
+    color: #334155 !important;
+    line-height: 1.65;
+}
+
+.no-data,
+.error-data {
+    padding: 42px 18px !important;
+    color: var(--muted) !important;
+    text-align: center !important;
+}
+
+.error-data {
+    color: var(--danger) !important;
+}
+
+@media (max-width: 900px) {
+    body {
+        display: block;
+    }
+
+    .sidebar {
+        position: sticky;
+        width: 100%;
+        height: auto;
+    }
+
+    .main {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .page-header {
+        grid-template-columns: 1fr;
+    }
+
+    .toolbar {
+        justify-content: stretch;
+    }
+
+    .search-wrap {
+        width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .table-scroll {
+        overflow: visible;
+    }
+
+    table,
+    thead,
+    tbody,
+    tr,
+    td {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tbody {
+        display: grid;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    tbody tr {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.86);
+        box-shadow: var(--shadow-sm);
+    }
+
+    td {
+        display: grid;
+        grid-template-columns: 86px 1fr;
+        gap: 12px;
+        padding: 12px 14px !important;
+        border-bottom: 1px solid var(--line) !important;
+        word-break: break-word;
+    }
+
+    td:last-child {
+        border-bottom: 0 !important;
+    }
+
+    td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 850;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .no-data,
+    .error-data {
+        display: block;
+    }
+
+    .no-data::before,
+    .error-data::before {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="sidebar">
+    <div class="logo">Fuel Distribution</div>
+
+    <a href="home.html">Home</a>
+    <a href="login.html">Login</a>
+    <a href="register.html">Register</a>
+    <a class="active" href="view_feedback.html">View Feedbacks</a>
+    <a href="about_us.html">About Us</a>
+</div>
+
+<main class="main">
+    <section class="feedback-page">
+        <header class="page-header">
+            <div class="header-copy">
+                <span class="eyebrow">Customer Voice</span>
+                <h1>Feedback</h1>
+                <p>Read customer ratings and comments in a simple, clean feedback view.</p>
+            </div>
+
+            <div class="summary-card" aria-live="polite">
+                <div>
+                    <span>Total Feedback</span>
+                    <strong id="feedbackCount">0</strong>
+                </div>
+                <div class="summary-icon">★</div>
+            </div>
+        </header>
+
+        <div class="toolbar">
+            <label class="search-wrap" for="feedbackSearch">
+                <input id="feedbackSearch" type="search" placeholder="Search feedback" autocomplete="off">
+            </label>
+        </div>
+
+        <div class="table-box">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Rating</th>
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tableData">
+                        <tr>
+                            <td colspan="4" class="no-data">Loading feedback...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+const tableData = document.getElementById("tableData");
+const feedbackCount = document.getElementById("feedbackCount");
+const feedbackSearch = document.getElementById("feedbackSearch");
+let feedbackList = [];
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function getStars(rating) {
+    let stars = "";
+    for (let i = 1; i <= 5; i++) {
+        stars += (i <= Number(rating)) ? "★" : "☆";
+    }
+    return stars;
+}
+
+function renderFeedback(list) {
+    feedbackCount.textContent = feedbackList.length;
+
+    if (list.length === 0) {
+        tableData.innerHTML = `
+            <tr>
+                <td colspan="4" class="no-data">No feedback available</td>
+            </tr>
+        `;
+        return;
+    }
+
+    tableData.innerHTML = list.map(item => `
+        <tr>
+            <td data-label="Username" class="user-cell">${escapeHtml(item.name)}</td>
+            <td data-label="Email" class="email-cell">${escapeHtml(item.email)}</td>
+            <td data-label="Rating" class="rating">${getStars(item.rating)}</td>
+            <td data-label="Comment" class="comment">${escapeHtml(item.comment)}</td>
+        </tr>
+    `).join("");
+}
+
+function filterFeedback() {
+    const query = feedbackSearch.value.trim().toLowerCase();
+
+    if (!query) {
+        renderFeedback(feedbackList);
+        return;
+    }
+
+    const filtered = feedbackList.filter(item => {
+        return [item.name, item.email, item.rating, item.comment]
+            .some(value => String(value ?? "").toLowerCase().includes(query));
+    });
+
+    renderFeedback(filtered);
+}
+
+feedbackSearch.addEventListener("input", filterFeedback);
+
+fetch("http://127.0.0.1:7000/view_feedback")
+    .then(res => res.json())
+    .then(data => {
+        feedbackList = Array.isArray(data) ? data : [];
+        renderFeedback(feedbackList);
+    })
+    .catch(err => {
+        console.log(err);
+        tableData.innerHTML = `
+            <tr>
+                <td colspan="4" class="error-data">Unable to load feedback</td>
+            </tr>
+        `;
+    });
+</script>
+
+</body>
+</html>

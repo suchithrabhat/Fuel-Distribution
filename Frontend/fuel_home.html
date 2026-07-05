@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fuel Dashboard</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+display:flex;
+background:#f1f5f9;
+}
+
+.sidebar{
+width:270px;
+height:100vh;
+background:#0f172a;
+position:fixed;
+left:0;
+top:0;
+padding-top:30px;
+}
+
+.logo{
+color:white;
+text-align:center;
+font-size:28px;
+font-weight:bold;
+margin-bottom:40px;
+}
+
+.sidebar a{
+display:block;
+padding:20px 35px;
+color:white;
+text-decoration:none;
+font-size:18px;
+}
+
+.sidebar a:hover,
+.active{
+background:#2563eb;
+}
+
+.main{
+margin-left:270px;
+padding:60px;
+width:100%;
+}
+
+.main h1{
+font-size:40px;
+color:#0f172a;
+margin-bottom:20px;
+}
+
+</style>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<div class="logo">
+Distributor Panel
+</div>
+
+<a href="add_fuel_price.html">Add Fuel Price</a>
+
+<a href="view_fuel_prices.html" class="active">
+View Fuel Price
+</a>
+
+<a href="my_bookings.html">View Bookings</a>
+
+<a href="view_revenue.html">View Revenue</a>
+
+<a href="login.html">Logout</a>
+
+</div>
+
+<div class="main">
+
+<h1>Distributor Dashboard</h1>
+
+</div>
+
+</body>
+</html>
